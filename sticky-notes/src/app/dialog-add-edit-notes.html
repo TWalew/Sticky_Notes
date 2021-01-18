@@ -1,0 +1,22 @@
+<h1 mat-dialog-title>Add a new note</h1>
+<div mat-dialog-content>
+  <mat-form-field class="col-12">
+    <mat-label>Author Name</mat-label>
+    <input matInput [(ngModel)]="data.author">
+  </mat-form-field>
+  <mat-form-field class="col-12">
+    <mat-label>What would you like to say ?</mat-label>
+    <textarea matInput [(ngModel)]="data.content"></textarea>
+  </mat-form-field>
+  <mat-form-field>
+    <!-- <ngx-mat-file-input #removableInput formControlName="removablefile" placeholder="Removable Input">
+    </ngx-mat-file-input>
+    <button mat-icon-button matSuffix *ngIf="!removableInput.empty" (click)="removableInput.clear($event)">
+      <mat-icon>clear</mat-icon>
+    </button> -->
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancelClick()" class="btn btn-danger">Cansel</button>
+  <button mat-button (click)="onSaveClick(data)" class="btn btn-success">Save</button>
+</div>

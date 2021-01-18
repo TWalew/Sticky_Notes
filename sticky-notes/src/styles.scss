@@ -1,1 +1,90 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  box-sizing: border-box;
+}
+
+.app app-note {
+  float: left;
+  padding: 15px;
+
+  .note {
+    background-color: rgb(255, 240, 70);
+    position: relative;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
+    margin-bottom: 1em;
+    border-radius: 10px 10px 0px 0px;
+
+    .note_toolbar {
+      background: #7f6c04;
+      border-radius: 8px 8px 0px 0px;
+      height: 40px;
+    }
+
+    .close {
+      top: 5px;
+      cursor: pointer;
+      color: black;
+      position: relative;
+    }
+
+    .content {
+      padding: 5px;
+      outline: none;
+      height: 150px;
+      border-radius: 8px;
+      overflow-y: auto;
+    }
+
+    .footer {
+      text-align: center;
+    }
+
+    button {
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      font-size: x-large;
+      outline: none;
+    }
+  }
+}
+
+.app {
+  overflow: auto;
+  margin-bottom: 50px;
+}
+
+.toolbar {
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 55px;
+  text-align: center;
+  position: fixed;
+  width: 100%;
+  background-color: gold;
+  border: 10px solid gray;
+  border-bottom: 0;
+  color: gray;
+  font-size: -webkit-xxx-large;
+  font-weight: bold;
+
+  button {
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 10px;
+    font-size: xx-large;
+    outline: none;
+    vertical-align: top;
+  }
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
