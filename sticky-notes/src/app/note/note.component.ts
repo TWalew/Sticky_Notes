@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ElementRef } from '@angular/core'
+import { Component, EventEmitter, Output, ElementRef, Input } from '@angular/core'
 
 @Component({
   selector: 'app-note',
@@ -7,17 +7,16 @@ import { Component, EventEmitter, Output, ElementRef } from '@angular/core'
 
 export class NoteComponent {
 
+  @Input() public data: any;
+
   @Output() dismiss = new EventEmitter();
   @Output() focusout = new EventEmitter();
 
-  constructor(private el: ElementRef) { }
+  constructor(private el: ElementRef) {
+  }
 
   onDismiss(event) {
     this.dismiss.emit(event);
-  }
-
-  onFocusOut(event) {
-    this.focusout.emit(event)
   }
 
 }

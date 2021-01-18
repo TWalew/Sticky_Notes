@@ -1,9 +1,10 @@
-import { Component, ElementRef, ChangeDetectionStrategy, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, ElementRef, ChangeDetectionStrategy, Inject, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export interface DialogData {
   author: string;
   content: string;
+  file: any;
 }
 @Component({
   selector: 'dialog-add-edit-notes',
@@ -16,13 +17,45 @@ export class DialogAddEditNotes {
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private cdRef: ChangeDetectorRef) { }
 
+
+  @ViewChild('fileInput') fileInput: ElementRef;
+  fileAttr = 'Choose File';
+
+  ngOnInit(): void {
+    this.fileAttr = this.data.file;
+  }
+
   public onCancelClick(): void {
     this.dialogRef.close();
   }
   public onSaveClick(data): void {
-    console.log(data);
+    this.data.file = this.fileAttr;
     this.dialogRef.close(data);
     this.cdRef.detectChanges();
+  }
+
+
+  public uploadFileEvt(imgFile: any) {
+    if (imgFile.target.files && imgFile.target.files[0]) {
+      this.fileAttr = '';
+      Array.from(imgFile.target.files).forEach((file: File) => {
+        this.fileAttr += file.name + ' - ';
+      });
+
+      let reader = new FileReader();
+      reader.onload = (e: any) => {
+        let image = new Image();
+        image.src = e.target.result;
+        image.onload = rs => {
+          let imgBase64Path = e.target.result;
+        };
+      };
+      reader.readAsDataURL(imgFile.target.files[0]);
+
+      this.fileInput.nativeElement.value = "";
+    } else {
+      this.fileAttr = 'Choose File';
+    }
   }
 
 }
@@ -36,79 +69,64 @@ export class AppComponent {
   notes = [];
   author: string = '';
   content: string = '';
+  file: File;
   constructor(
     public dialog: MatDialog,
-    private el: ElementRef
+    private cdRef: ChangeDetectorRef
   ) {
+    this.getAllNotes();
+  }
+
+  public getAllNotes(): void {
     this.notes = JSON.parse(localStorage.getItem('notes')) || [{ id: 0, content: '' }];
   }
 
-  openDialog(): void {
+  public addNote(): void {
     const dialogRef = this.dialog.open(DialogAddEditNotes, {
       width: '850px',
-      data: { author: this.author, content: this.content }
+      data: { author: this.author, content: this.content, file: this.file }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      console.log(result)
-    });
-  }
-  updateAllNotes() {
-    console.log(document.querySelectorAll('app-note'));
-    let notes = document.querySelectorAll('app-note');
-
-    notes.forEach((note, index) => {
-      console.log(note.querySelector('.content').innerHTML)
-      this.notes[note.id].content = note.querySelector('.content').innerHTML;
-      this.notes[note.id].title = note.querySelector('.title').innerHTML;
-    });
-
-    localStorage.setItem('notes', JSON.stringify(this.notes));
-
-  }
-
-  addNote() {
-    this.openDialog();
-    // this.notes.push({ id: this.notes.length + 1, title: '', content: '' });
-    // // sort the array
-    // this.notes = this.notes.sort((a, b) => { return b.id - a.id });
-    // localStorage.setItem('notes', JSON.stringify(this.notes));
+    dialogRef.afterClosed().subscribe(
+      result => {
+        this.notes.push({ id: this.notes.length + 1, date: new Date, author: result.author, content: result.content, file: result.file });
+        this.notes = this.notes.sort((a, b) => { return b.id - a.id });
+        localStorage.setItem('notes', JSON.stringify(this.notes));
+        this.getAllNotes();
+        this.cdRef.detectChanges();
+      });
   };
 
-  saveNote(event) {
-    const id = event.srcElement.parentElement.parentElement.getAttribute('id');
-    const title = event.target.innerText;
-    const content = event.target.innerText;
-    event.target.innerText = content;
-    const json = {
-      'id': id,
-      // 'title': title.
-      'content': content
-    }
-    this.updateNote(json);
-    localStorage.setItem('notes', JSON.stringify(this.notes));
-  }
-
-  updateNote(newValue) {
-    this.notes.forEach((note, index) => {
-      if (note.id == newValue.id) {
-        this.notes[index].title = newValue.title;
-        this.notes[index].content = newValue.content;
-      }
+  public updateNote(note): void {
+    const dialogRef = this.dialog.open(DialogAddEditNotes, {
+      width: '850px',
+      data: { author: note.author, content: note.content, file: note.file }
     });
+
+    dialogRef.afterClosed().subscribe(
+      result => {
+        this.notes.forEach((note, index) => {
+          if (note.id == result.id) {
+            this.notes[index].author = result.author;
+            this.notes[index].content = result.content;
+            this.notes[index].file = result.file;
+          }
+          localStorage.setItem('notes', JSON.stringify(this.notes));
+          this.cdRef.detectChanges();
+        });
+      });
   }
 
-  deleteNote(event) {
+  public deleteNote(event): void {
     const id = event.srcElement.parentElement.parentElement.parentElement.getAttribute('id');
-    this.notes.forEach((note, index) => {
-      if (note.id == id) {
-        this.notes.splice(index, 1);
-        localStorage.setItem('notes', JSON.stringify(this.notes));
-        return;
-      }
-    });
+    this.notes.forEach(
+      (note, index) => {
+        if (note.id == id) {
+          this.notes.splice(index, 1);
+          localStorage.setItem('notes', JSON.stringify(this.notes));
+          this.cdRef.detectChanges();
+          return;
+        }
+      });
   }
-
-
 }
